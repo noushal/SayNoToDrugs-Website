@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrugFreeLife</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
+      --card: 0 0% 100%;
+      --card-foreground: 222.2 84% 4.9%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 222.2 84% 4.9%;
+      --primary: 0 83.2% 53.3%; /* Changed from blue to red */
+      --primary-foreground: 0 0% 100%; /* Adjusted for contrast with red */
+      --secondary: 210 40% 96.1%;
+      --secondary-foreground: 222.2 47.4% 11.2%;
+      --muted: 210 40% 96.1%;
+      --muted-foreground: 215.4 16.3% 46.9%;
+      --accent: 210 40% 96.1%;
+      --accent-foreground: 222.2 47.4% 11.2%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring: 0 83.2% 53.3%; /* Changed to match red */
+      --radius: 0.5rem;
+    }
+
+    .dark {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+      --popover: 222.2 84% 4.9%;
+      --popover-foreground: 210 40% 98%;
+      --primary: 0 91.2% 59.8%; /* Changed from blue to red */
+      --primary-foreground: 0 0% 100%; /* Adjusted for contrast with red */
+      --secondary: 217.2 32.6% 17.5%;
+      --secondary-foreground: 210 40% 98%;
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+      --accent: 217.2 32.6% 17.5%;
+      --accent-foreground: 210 40% 98%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring: 0 91.2% 59.8%; /* Changed to match red */
+    }
+
+    * {
+      border-color: hsl(var(--border));
+    }
+
+    body {
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+    }
+
+    . animate-beat {
+      animation: beat 1.5s ease-in-out infinite;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .animate-slide-up {
+      animation: slideUp 0.8s ease-out;
+    }
+
+    .animate-slide-in-right {
+      animation: slideInRight 0.8s ease-out;
+    }
+
+    .animate-slide-in-left {
+      animation: slideInLeft 0.8s ease-out;
+    }
+
+    .animate-count {
+      animation: count 2s ease-out forwards;
+    }
+
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .animate-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes beat {
+      0%, 100% {
+        transform: scale(1);
+      }
+      25% {
+        transform: scale(1.2);
+      }
+      40% {
+        transform: scale(0.9);
+      }
+      60% {
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes count {
+      from { content: "0"; }
+      to { content: attr(data-value); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Loading Screen -->
+  <div id="loading" class="fixed inset-0 flex items-center justify-center bg-white z-50">
+    <div class="text-center">
+      <div class="inline-flex items-center justify-center">
+        <i data-lucide="heart" class="h-16 w-16 text-[hsl(var(--primary))] animate-pulse fill-[hsl(var(--primary))] animate-beat"></i>
+      </div>
+      <p class="mt-4 text-lg font-medium text-[hsl(var(--primary))] animate-fade-in">Loading DrugFreeLife...</p>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 w-full border-b bg-[hsl(var(--background))/0.95] backdrop-blur supports-[backdrop-filter]:bg-[hsl(var(--background))/0.60]">
+    <div class="container mx-auto px-4 flex h-16 items-center justify-between">
+      <div class="flex items-center gap-2 font-bold text-xl text-[hsl(var(--primary))]">
+        <i data-lucide="heart" class="h-6 w-6 fill-[hsl(var(--primary))] animate-beat"></i>
+        <span>DrugFreeLife</span>
+      </div>
+      <nav class="hidden md:flex gap-6">
+        <a href="#why-say-no" class="text-sm font-medium hover:text-[hsl(var(--primary))] transition-colors duration-200">Why Say No</a>
+        <a href="#stories" class="text-sm font-medium hover:text-[hsl(var(--primary))] transition-colors duration-200">Stories</a>
+        <a href="#resources" class="text-sm font-medium hover:text-[hsl(var(--primary))] transition-colors duration-200">Resources</a>
+        <a href="#get-help" class="text-sm font-medium hover:text-[hsl(var(--primary))] transition-colors duration-200">Get Help</a>
+      </nav>
+      <a href="#join" class="inline-flex items-center justify-center rounded-md bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] shadow transition-transform duration-200 hover:scale-105 hover:bg-[hsl(var(--primary))/0.9] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2">Join The Movement</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1">
+    <!-- Hero Section -->
+    <section class="relative">
+      <div class="absolute inset-0 bg-gradient-to-r from-[hsl(var(--primary))/0.2] to-[hsl(var(--primary))/0.05] z-10"></div>
+      <div class="relative h-[600px]">
+        <img src="./drug.jpeg" alt="People supporting each other" class="object-cover w-full h-full" loading="eager">
+      </div>
+      <div class="absolute inset-0 flex items-center z-20">
+        <div class="container mx-auto px-4">
+          <div class="max-w-2xl space-y-6">
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white drop-shadow-md animate-slide-up">Say No to Drugs</h1>
+            <p class="text-xl md:text-2xl text-white drop-shadow-md animate-slide-up" style="animation-delay: 0.2s;">Empowering Youth. Educating Communities. Saving Lives.</p>
+            <div class="flex flex-col sm:flex-row gap-4 animate-slide-up" style="animation-delay: 0.4s;">
+              <a href="#learn-more" class="inline-flex items-center justify-center rounded-md bg-[hsl(var(--primary))] px-6 py-3 text-base font-medium text-[hsl(var(--primary-foreground))] shadow transition-transform duration-200 hover:scale-105 hover:bg-[hsl(var(--primary))/0.9] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2">Learn More</a>
+              <a href="#join" class="inline-flex items-center justify-center rounded-md bg-white/90 px-6 py-3 text-base font-medium text-[hsl(var(--foreground))] border border-[hsl(var(--border))] transition-transform duration-200 hover:scale-105 hover:bg-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2">Join The Movement</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Say No Section -->
+    <section id="why-say-no" class="py-16 md:py-24 bg-[hsl(var(--muted))/0.5]">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12 animate-on-scroll">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Why Say No to Drugs</h2>
+          <p class="text-[hsl(var(--muted-foreground))] max-w-2xl mx-auto">Understanding the risks and consequences of drug use is the first step toward making informed decisions.</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="bg-[hsl(var(--card))] rounded-[var(--radius)] shadow animate-on-scroll transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+            <div class="p-6 space-y-1">
+              <div class="bg-[hsl(var(--primary))/0.1] w-12 h-12 rounded-full flex items-center justify-center mb-2">
+                <i data-lucide="brain" class="h-6 w-6 text-[hsl(var(--primary))]"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Mental Health Impact</h3>
+            </div>
+            <div class="px-6 pb-6">
+              <p class="text-[hsl(var(--muted-foreground))]">Drugs can cause anxiety, depression, psychosis, and other mental health disorders. They alter brain chemistry and can lead to long-term cognitive issues.</p>
+            </div>
+          </div>
+          <div class="bg-[hsl(var(--card))] rounded-[var(--radius)] shadow animate-on-scroll transition-all duration-300 hover:shadow-lg hover:-translate-y-1" style="animation-delay: 0.2s;">
+            <div class="p-6 space-y-1">
+              <div class="bg-[hsl(var(--primary))/0.1] w-12 h-12 rounded-full flex items-center justify-center mb-2">
+                <i data-lucide="heart" class="h-6 w-6 text-[hsl(var(--primary))]"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Physical Health Risks</h3>
+            </div>
+            <div class="px-6 pb-6">
+              <p class="text-[hsl(var(--muted-foreground))]">Drug use can lead to heart disease, respiratory problems, weakened immune system, and increased risk of infectious diseases.</p>
+            </div>
+          </div>
+          <div class="bg-[hsl(var(--card))] rounded-[var(--radius)] shadow animate-on-scroll transition-all duration-300 hover:shadow-lg hover:-translate-y-1" style="animation-delay: 0.4s;">
+            <div class="p-6 space-y-1">
+              <div class="bg-[hsl(var(--primary))/0.1] w-12 h-12 rounded-full flex items-center justify-center mb-2">
+                <i data-lucide="users" class="h-6 w-6 text-[hsl(var(--primary))]"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Social Consequences</h3>
+            </div>
+            <div class="px-6 pb-6">
+              <p class="text-[hsl(var(--muted-foreground))]">Drug addiction can damage relationships, lead to isolation, affect academic and work performance, and create financial hardship.</p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-16 bg-white rounded-xl shadow-lg overflow-hidden animate-on-scroll">
+          <div class="grid md:grid-cols-2">
+            <div class="p-8 md:p-12 flex flex-col justify-center">
+              <h3 class="text-2xl font-bold mb-4">The Statistics</h3>
+              <ul class="space-y-4">
+                <li class="flex items-start gap-3">
+                  <i data-lucide="bar-chart-3" class="h-5 w-5 text-[hsl(var(--primary))] mt-0.5 flex-shrink-0"></i>
+                  <p><span class="font-semibold" id="stat-deaths">0</span>+ drug overdose deaths occur annually in the United States</p>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i data-lucide="bar-chart-3" class="h-5 w-5 text-[hsl(var(--primary))] mt-0.5 flex-shrink-0"></i>
+                  <p><span class="font-semibold" id="stat-mental">0</span>% of individuals with severe mental disorders are affected by substance abuse</p>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i data-lucide="bar-chart-3" class="h-5 w-5 text-[hsl(var(--primary))] mt-0.5 flex-shrink-0"></i>
+                  <p><span class="font-semibold" id="stat-teen">0</span>% of addictions start in the teenage years</p>
+                </li>
+              </ul>
+              <a href="#learn-more" class="mt-6 inline-flex items-center justify-center rounded-md border border-[hsl(var(--border))] bg-transparent px-4 py-2 text-sm font-medium text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] transition-transform duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2">
+                View More Statistics <i data-lucide="arrow-right" class="ml-2 h-4 w-4"></i>
+              </a>
+            </div>
+            <div class="bg-[hsl(var(--muted))] relative h-[300px] md:h-auto">
+              <img src="./free.jpeg" alt="Drug awareness infographic" class="object-cover w-full h-full">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stories Section -->
+    <section id="stories" class="py-16 md:py-24">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12 animate-on-scroll">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Real Stories, Real Impact</h2>
+          <p class="text-[hsl(var(--muted-foreground))] max-w-2xl mx-auto">Hear from those who have experienced the consequences of drug use and those who have chosen a different path.</p>
+        </div>
+        <div class="max-w-4xl mx-auto animate-on-scroll">
+          <div class="grid w-full grid-cols-3 gap-2 mb-6">
+            <button data-tab="recovery" class="tab-button px-4 py-2 text-sm font-medium rounded-md bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))] transition-all duration-200 active">Recovery Stories</button>
+            <button data-tab="prevention" class="tab-button px-4 py-2 text-sm font-medium rounded-md bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))] transition-all duration-200">Prevention Success</button>
+            <button data-tab="family" class="tab-button px-4 py-2 text-sm font-medium rounded-md bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))] transition-all duration-200">Family Impact</button>
+          </div>
+          <div id="tab-content">
+            <!-- Recovery Stories -->
+            <div id="recovery" class="tab-content bg-[hsl(var(--card))] rounded-[var(--radius)] shadow transition-all duration-300 hover:shadow-lg">
+              <div class="pt-6 px-6 pb-6">
+                <div class="space-y-6">
+                  <div class="flex items-start gap-4 animate-slide-in-right">
+                    <div class="rounded-full bg-[hsl(var(--muted))] h-12 w-12 flex-shrink-0 overflow-hidden relative">
+                      <img src="https://via.placeholder.com/48" alt="Profile" class="object-cover w-full h-full">
+                    </div>
+                    <div>
+                      <h4 class="font-semibold">Michael's Journey</h4>
+                      <p class="text-[hsl(var(--muted-foreground))] mt-2">"I started using drugs to fit in during high school. What began as weekend experimentation quickly spiraled into daily use. I lost my scholarship, damaged relationships with my family, and nearly lost my life to an overdose. Recovery wasn't easy, but with support, I've been clean for 5 years now. I'm back in school and rebuilding my life."</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-4 animate-slide-in-right" style="animation-delay: 0.2s;">
+                    <div class="rounded-full bg-[hsl(var(--muted))] h-12 w-12 flex-shrink-0 overflow-hidden relative">
+                      <img src="https://via.placeholder.com/48" alt="Profile" class="object-cover w-full h-full">
+                    </div>
+                    <div>
+                      <h4 class="font-semibold">Sarah's Story</h4>
+                      <p class="text-[hsl(var(--muted-foreground))] mt-2">"Prescription painkillers after a sports injury led me down a dark path. I never thought it could happen to me. Recovery has taught me resilience and the importance of asking for help. Now I coach youth sports and share my story to help others avoid the same mistakes."</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Prevention Stories -->
+            <div id="prevention" class="tab-content bg-[hsl(var(--card))] rounded-[var(--radius)] shadow transition-all duration-300 hover:shadow-lg hidden">
+              <div class="pt-6 px-6 pb-6">
+                <div class="space-y-6">
+                  <div class="flex items-start gap-4 animate-slide-in-right">
+                    <div class="rounded-full bg-[hsl(var(--muted))] h-12 w-12 flex-shrink-0 overflow-hidden relative">
+                      <img src="https://via.placeholder.com/48" alt="Profile" class="object-cover w-full h-full">
+                    </div>
+                    <div>
+                      <h4 class="font-semibold">Jason's Choice</h4>
+                      <p class="text-[hsl(var(--muted-foreground))] mt-2">"Growing up in a neighborhood where drugs were everywhere, I faced pressure daily. My school's prevention program gave me the tools to resist peer pressure and understand the consequences. I found my passion in music instead, which kept me focused on positive goals."</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-4 animate-slide-in-right" style="animation-delay: 0.2s;">
+                    <div class="rounded-full bg-[hsl(var(--muted))] h-12 w-12 flex-shrink-0 overflow-hidden relative">
+                      <img src="https://via.placeholder.com/48" alt="Profile" class="object-cover w-full h-full">
+                    </div>
+                    <div>
+                      <h4 class="font-semibold">Emma's Path</h4>
+                      <p class="text-[hsl(var(--muted-foreground))] mt-2">"When my friends started experimenting with drugs at parties, I made a conscious decision to stay clean. It wasn't always easy being the one who said no, but I've achieved my goals without the setbacks that drugs caused for some of my peers."</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Family Stories -->
+            <div id="family" class="tab-content bg-[hsl(var(--card))] rounded-[var(--radius)] shadow transition-all duration-300 hover:shadow-lg hidden">
+              <div class="pt-6 px-6 pb-6">
+                <div class="space-y-6">
+                  <div class="flex items-start gap-4 animate-slide-in-right">
+                    <div class="rounded-full bg-[hsl(var(--muted))] h-12 w-12 flex-shrink-0 overflow-hidden relative">
+                      <img src="https://via.placeholder.com/48" alt="Profile" class="object-cover w-full h-full">
+                    </div>
+                    <div>
+                      <h4 class="font-semibold">The Rodriguez Family</h4>
+                      <p class="text-[hsl(var(--muted-foreground))] mt-2">"When our son became addicted to drugs, it affected our entire family. The emotional toll, financial strain, and constant worry were overwhelming. Through family therapy and support groups, we learned how to support his recovery while taking care of ourselves."</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-4 animate-slide-in-right" style="animation-delay: 0.2s;">
+                    <div class="rounded-full bg-[hsl(var(--muted))] h-12 w-12 flex-shrink-0 overflow-hidden relative">
+                      <img src="https://via.placeholder.com/48" alt="Profile" class="object-cover w-full h-full">
+                    </div>
+                    <div>
+                      <h4 class="font-semibold">Lisa's Perspective</h4>
+                      <p class="text-[hsl(var(--muted-foreground))] mt-2">"As a sister of someone who struggled with addiction, I felt helpless watching my brother change. Our family's journey through his recovery taught us patience, compassion, and the importance of open communication. Today, we're closer than ever."</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-12">
+            <a href="#share-story" class="inline-flex items-center justify-center rounded-md bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] shadow transition-transform duration-200 hover:scale-105 hover:bg-[hsl(var(--primary))/0.9] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2">Share Your Story</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="py-16 md:py-24 bg-[hsl(var(--muted))/0.5]">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12 animate-on-scroll">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Resources & Education</h2>
+          <p class="text-[hsl(var(--muted-foreground))] max-w-2xl mx-auto">Access tools, information, and support to help yourself or someone you care about.</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="flex flex-col h-full bg-[hsl(var(--card))] rounded-[var(--radius)] shadow animate-on-scroll transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+            <div class="p-6">
+              <i data-lucide="book-open" class="h-8 w-8 text-[hsl(var(--primary))] mb-2"></i>
+              <h3 class="text-xl font-semibold">Educational Materials</h3>
+              <p class="text-[hsl(var(--muted-foreground))] text-sm">Evidence-based information about different drugs and their effects</p>
+            </div>
+            <div class="px-6 pb-6 flex-1">
+              <ul class="space-y-2">
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">Understanding Addiction</a>
+                </li>
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">Drug Facts & Effects</a>
+                </li>
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">Prevention Strategies</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="flex flex-col h-full bg-[hsl(var(--card))] rounded-[var(--radius)] shadow animate-on-scroll transition-all duration-300 hover:shadow-lg hover:-translate-y-1" style="animation-delay: 0.2s;">
+            <div class="p-6">
+              <i data-lucide="calendar" class="h-8 w-8 text-[hsl(var(--primary))] mb-2"></i>
+              <h3 class="text-xl font-semibold">Programs & Events</h3>
+              <p class="text-[hsl(var(--muted-foreground))] text-sm">Join prevention initiatives and community events</p>
+            </div>
+            <div class="px-6 pb-6 flex-1">
+              <ul class="space-y-2">
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">School Prevention Programs</a>
+                </li>
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">Community Awareness Events</a>
+                </li>
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">Parent Workshops</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="flex flex-col h-full bg-[hsl(var(--card))] rounded-[var(--radius)] shadow animate-on-scroll transition-all duration-300 hover:shadow-lg hover:-translate-y-1" style="animation-delay: 0.4s;">
+            <div class="p-6">
+              <i data-lucide="message-circle" class="h-8 w-8 text-[hsl(var(--primary))] mb-2"></i>
+              <h3 class="text-xl font-semibold">Support Networks</h3>
+              <p class="text-[hsl(var(--muted-foreground))] text-sm">Connect with support groups and counseling services</p>
+            </div>
+            <div class="px-6 pb-6 flex-1">
+              <ul class="space-y-2">
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">Find Local Support Groups</a>
+                </li>
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">Online Communities</a>
+                </li>
+                <li class="flex items-center gap-2 group">
+                  <i data-lucide="arrow-right" class="h-4 w-4 text-[hsl(var(--primary))] transition-transform duration-300 group-hover:translate-x-1"></i>
+                  <a href="#" class="hover:underline">Family Support Resources</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Get Help Section -->
+    <section id="get-help" class="py-16 md:py-24 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center animate-on-scroll">
+          <h2 class="text-3xl md:text-4xl font-bold mb-6">Need Help Now?</h2>
+          <p class="text-xl mb-8 text-[hsl(var(--primary-foreground))/0.9]">If you or someone you know is struggling with drug use, help is available 24/7.</p>
+          <div class="bg-white text-[hsl(var(--foreground))] rounded-xl p-8 shadow-lg animate-on-scroll transition-all duration-300 hover:shadow-xl">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
+              <div class="text-center md:text-left">
+                <h3 class="text-xl font-bold mb-2">National Helpline</h3>
+                <div class="flex items-center justify-center md:justify-start gap-2 text-2xl font-bold text-[hsl(var(--primary))]">
+                  <i data-lucide="phone" class="h-6 w-6 animate-pulse"></i>
+                  <span>1-800-662-HELP (4357)</span>
+                </div>
+                <p class="mt-2 text-[hsl(var(--muted-foreground))]">Free, confidential, 24/7/365 treatment referral and information</p>
+              </div>
+              <div class="md:border-l md:pl-12 md:h-24 flex items-center">
+                <button class="inline-flex items-center justify-center rounded-md bg-[hsl(var(--primary))] px-6 py-3 text-base font-medium text-[hsl(var(--primary-foreground))] shadow transition-transform duration-200 hover:scale-105 hover:bg-[hsl(var(--primary))/0.9] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2 w-full md:w-auto">Chat Online Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Join The Movement Section -->
+    <section id="join" class="py-16 md:py-24">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center animate-on-scroll">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Join The Movement</h2>
+          <p class="text-[hsl(var(--muted-foreground))] mb-8">Be part of the solution. Sign up to receive updates, volunteer opportunities, and resources to help spread awareness.</p>
+          <div class="bg-[hsl(var(--muted))] p-8 rounded-xl animate-on-scroll transition-all duration-300 hover:shadow-lg">
+            <div class="space-y-4">
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label for="first-name" class="text-sm font-medium">First Name</label>
+                  <input id="first-name" class="flex h-10 w-full rounded-md border border-[hsl(var(--input))] bg-[hsl(var(--background))] px-3 py-2 text-sm placeholder:text-[hsl(var(--muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200" placeholder="Enter your first name">
+                </div>
+                <div class="space-y-2">
+                  <label for="last-name" class="text-sm font-medium">Last Name</label>
+                  <input id="last-name" class="flex h-10 w-full rounded-md border border-[hsl(var(--input))] bg-[hsl(var(--background))] px-3 py-2 text-sm placeholder:text-[hsl(var(--muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200" placeholder="Enter your last name">
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label for="email" class="text-sm font-medium">Email</label>
+                <input id="email" type="email" class="flex h-10 w-full rounded-md border border-[hsl(var(--input))] bg-[hsl(var(--background))] px-3 py-2 text-sm placeholder:text-[hsl(var(--muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200" placeholder="Enter your email">
+              </div>
+              <div class="space-y-2">
+                <label for="involvement" class="text-sm font-medium">How would you like to get involved?</label>
+                <select id="involvement" class="flex h-10 w-full rounded-md border border-[hsl(var(--input))] bg-[hsl(var(--background))] px-3 py-2 text-sm placeholder:text-[hsl(var(--muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200">
+                  <option value="" disabled selected>Select an option</option>
+                  <option value="volunteer">Volunteer</option>
+                  <option value="donate">Donate</option>
+                  <option value="share">Share Information</option>
+                  <option value="event">Organize an Event</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <button class="inline-flex items-center justify-center rounded-md bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] shadow transition-transform duration-200 hover:scale-105 hover:bg-[hsl(var(--primary))/0.9] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2 w-full">Join Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[hsl(var(--muted))] py-12 border-t">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="animate-on-scroll">
+          <h3 class="font-semibold mb-4">About Us</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Our Mission</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Team</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Partners</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Contact</a></li>
+          </ul>
+        </div>
+        <div class="animate-on-scroll" style="animation-delay: 0.1s;">
+          <h3 class="font-semibold mb-4">Resources</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Educational Materials</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Research</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Prevention Programs</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Support Services</a></li>
+          </ul>
+        </div>
+        <div class="animate-on-scroll" style="animation-delay: 0.2s;">
+          <h3 class="font-semibold mb-4">Get Involved</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Volunteer</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Donate</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Fundraise</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Spread Awareness</a></li>
+          </ul>
+        </div>
+        <div class="animate-on-scroll" style="animation-delay: 0.3s;">
+          <h3 class="font-semibold mb-4">Connect</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Facebook</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Twitter</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">Instagram</a></li>
+            <li><a href="#" class="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-200">YouTube</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 pt-8 border-t text-center text-sm text-[hsl(var(--muted-foreground))] animate-on-scroll">
+        <p>© 2025 Say No to Drugs Campaign. All rights reserved.</p>
+        <div class="mt-2 flex justify-center gap-4">
+          <a href="#" class="hover:text-[hsl(var(--foreground))] transition-colors duration-200">Privacy Policy</a>
+          <a href="#" class="hover:text-[hsl(var(--foreground))] transition-colors duration-200">Terms of Service</a>
+          <a href="#" class="hover:text-[hsl(var(--foreground))] transition-colors duration-200">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Loading state
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loading').style.display = 'none';
+        // Animate statistics
+        setTimeout(() => {
+          animateValue('stat-deaths', 0, 70000, 2000);
+          animateValue('stat-mental', 0, 50, 2000);
+          animateValue('stat-teen', 0, 90, 2000);
+        }, 500);
+      }, 2000);
+    });
+
+    // Animate statistics
+    function animateValue(id, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const value = Math.floor(progress * (end - start) + start);
+        document.getElementById(id).textContent = value.toLocaleString();
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    // Tab functionality
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const tab = button.getAttribute('data-tab');
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.add('hidden'));
+        button.classList.add('active');
+        document.getElementById(tab).classList.remove('hidden');
+      });
+    });
+  </script>
+</body>
+</html>
